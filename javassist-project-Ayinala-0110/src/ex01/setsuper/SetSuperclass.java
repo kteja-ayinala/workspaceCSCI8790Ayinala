@@ -45,7 +45,8 @@ public class SetSuperclass {
 			if (argswithcommon == 1) {
 				insertClassPath(pool);
 				CtClass cc = pool.get(subclass);
-				setSuperclass(cc, superclass, pool);
+//				setSuperclass(cc, superclass, pool);
+				setSuperClass(subclass,superclass);
 				cc.writeFile(outputDir);
 				System.out.println("[DBG] write output to: " + outputDir);
 			} else if (argswithcommon == 2) {
@@ -55,7 +56,8 @@ public class SetSuperclass {
 						subclass = "target." + arg1;
 						insertClassPath(pool);
 						CtClass cc = pool.get(subclass);
-						setSuperclass(cc, superclass, pool);
+//						setSuperclass(cc, superclass, pool);
+						setSuperClass(subclass,superclass);
 						cc.writeFile(outputDir);
 						System.out.println("[DBG] write output to: " + outputDir);
 					} else {
@@ -63,7 +65,8 @@ public class SetSuperclass {
 						subclass = "target." + arg1;
 						insertClassPath(pool);
 						CtClass cc = pool.get(subclass);
-						setSuperclass(cc, superclass, pool);
+//						setSuperclass(cc, superclass, pool);
+						setSuperClass(subclass,superclass);
 						cc.writeFile(outputDir);
 						System.out.println("[DBG] write output to: " + outputDir);
 					}
@@ -73,35 +76,18 @@ public class SetSuperclass {
 				superclass = "target." + arg0;
 				subclass = "target." + arg1;
 				CtClass cc = pool.get(subclass);
-				setSuperclass(cc, superclass, pool);
+//				setSuperclass(cc, superclass, pool);
+				setSuperClass(subclass,superclass);
 				cc.writeFile(outputDir);
 				System.out.println("[DBG] write output to: " + outputDir);
 			}
-			/*
-			 * boolean useRuntimeClass = true; if (useRuntimeClass) {
-			 * insertClassPathRunTimeClass(pool); } else {
-			 */
-			// insertClassPath(pool);
-			/* } */
 
-			// CtClass cc = pool.get("target.Rectangle");
-			// setSuperclass(cc, "target.Point", pool);
-			// CtClass cc = pool.get(baseclass);
-			// setSuperclass(cc, superclass, pool);
-
-			// cc.writeFile(outputDir);
 			System.out.println("[DBG] write output to: " + outputDir);
 		} catch (NotFoundException | CannotCompileException | IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	/*
-	 * static void insertClassPathRunTimeClass(ClassPool pool) throws
-	 * NotFoundException { ClassClassPath classPath = new ClassClassPath(new
-	 * Rectangle().getClass()); pool.insertClassPath(classPath);
-	 * System.out.println("[DBG] insert classpath: " + classPath.toString()); }
-	 */
 
 	static void insertClassPath(ClassPool pool) throws NotFoundException {
 		String strClassPath = workDir + _S + "classfiles";
@@ -109,11 +95,31 @@ public class SetSuperclass {
 		System.out.println("[DBG] insert classpath: " + strClassPath);
 	}
 
-	static void setSuperclass(CtClass curClass, String superClass, ClassPool pool)
-			throws NotFoundException, CannotCompileException {
-		curClass.setSuperclass(pool.get(superClass));
-		System.out.println("[DBG] set superclass: " + curClass.getSuperclass().getName() + //
-				", subclass: " + curClass.getName());
-	}
+//	static void setSuperclass(CtClass curClass, String superClass, ClassPool pool)
+//			throws NotFoundException, CannotCompileException {
+//		curClass.setSuperclass(pool.get(superClass));
+//		System.out.println("[DBG] set superclass: " + curClass.getSuperclass().getName() + //
+//				", subclass: " + curClass.getName());
+//	}
+	
+	static void setSuperClass(String clazSub, String clazSuper) {
+	      try {
+	         ClassPool pool = ClassPool.getDefault();
+	         insertClassPath(pool);
+
+	         CtClass ctClazSub = pool.get("target." + clazSub);
+	         CtClass ctClazSuper = pool.get("target." + clazSuper);
+	         ctClazSub.setSuperclass(ctClazSuper);
+	         System.out.println("[DBG] set superclass: " //
+	               + ctClazSub.getSuperclass().getName() //
+	               + ", subclass: " + ctClazSub.getName());
+
+	         ctClazSub.writeFile(outputDir);
+	         System.out.println("[DBG] write output to: " + outputDir);
+	      } catch (NotFoundException | CannotCompileException | IOException e) {
+	         e.printStackTrace();
+	      }
+	   }
+
 
 }

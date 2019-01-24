@@ -1,6 +1,6 @@
 package target;
 
-public class Common-Point
+public class CommonPoint
 {
    int x, y;
 
