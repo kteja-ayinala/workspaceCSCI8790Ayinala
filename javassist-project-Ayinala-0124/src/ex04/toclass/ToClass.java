@@ -1,5 +1,8 @@
 package ex04.toclass;
 
+import java.io.File;
+import java.io.IOException;
+
 import ex04.util.UtilMenu;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
@@ -8,7 +11,10 @@ import javassist.CtConstructor;
 import javassist.NotFoundException;
 
 public class ToClass {
-	public static void main(String[] args) {
+	   static String _S = File.separator;
+	   static String WORK_DIR = System.getProperty("user.dir");
+	static String OUTPUT_DIR = WORK_DIR + _S + "output";
+	public static void main(String[] args) throws IOException {
 		try {
 			// Hello orig = new Hello(); // java.lang.LinkageError
 
@@ -28,10 +34,12 @@ public class ToClass {
 							CtClass cc = cp.get("target." + clz);
 							CtConstructor declaredConstructor = cc.getDeclaredConstructor(new CtClass[0]);
 							declaredConstructor.insertAfter("{ " //
-									+ "System.out.println(\"[TR] After calling a constructor: \" + id); }");
+									+ "System.out.println(\"[TR] id:\" + id);"
+									+ "System.out.println(\"[TR] year:\" + year); }");
 
 							Class<?> c = cc.toClass();
 							c.newInstance();
+							cc.writeFile(OUTPUT_DIR);
 						}
 					}
 					break;
