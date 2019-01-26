@@ -2,7 +2,9 @@ package javassistloader;
 
 import java.io.File;
 import java.lang.reflect.Method;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -12,15 +14,18 @@ import javassist.Loader;
 import util.UtilMenu;
 
 public class JavassistLoaderExample {
-   private static final String WORK_DIR = System.getProperty("user.dir");
-   private static final String INPUT_DIR = WORK_DIR + File.separator + "classfiles";
-   private static final String TARGET_POINT = "target.Point";
-   private static final String TARGET_RECTANGLE = "target.Rectangle";
+	private static final String WORK_DIR = System.getProperty("user.dir");
+	private static final String INPUT_DIR = WORK_DIR + File.separator + "classfiles";
+	private static final String TARGET_POINT = "target.Point";
+	private static final String TARGET_RECTANGLE = "target.Rectangle";
+	static String _S = File.separator;
+	static String OUTPUT_DIR = WORK_DIR + _S + "output";
+	static String verifyMethod ;
 
-   public static void main(String[] args) {
-      try {
-         ClassPool cp = ClassPool.getDefault();
-         while (true) {
+	public static void main(String[] args) {
+		try {
+
+			while (true) {
 				UtilMenu.showMenuOptions();
 				switch (UtilMenu.getOption()) {
 				case 1:
@@ -30,49 +35,46 @@ public class JavassistLoaderExample {
 						System.out.println("[WRN]: Invalid Input");
 						continue;
 					} else {
-						 cp.insertClassPath(INPUT_DIR);
-				         System.out.println("[DBG] insert classpath: " + INPUT_DIR);
+						ClassPool pool = ClassPool.getDefault();
+						pool.insertClassPath(INPUT_DIR);
+						System.out.println("[DBG] class path: " + INPUT_DIR);
 
-				         CtClass cc = cp.get(TARGET_RECTANGLE);
-				         cc.setSuperclass(cp.get(TARGET_POINT));
-						for (String mthd : mthdNames) {
-//							CtClass cc = cp.get("target." + mthd);
-							
-						}
+						CtClass cc = pool.get(TARGET_RECTANGLE);
+						 cc.defrost();
+						cc.setSuperclass(pool.get(TARGET_POINT));
+						System.out.println(verifyMethod+" "+ mthdNames[0].toString());
+//						if(!verifyMethod.equals(mthdNames[0].toString())){
+						CtMethod m1 = cc.getDeclaredMethod(mthdNames[0]);
+						
+						 
+						m1.insertBefore("{ " //
+								+ mthdNames[1].toString() + "();" //
+								+ "System.out.println(\"[TR] getX result : \"+" + mthdNames[2] + "());}");
+						Loader cl = new Loader(pool);
+						Class<?> c = cl.loadClass(TARGET_RECTANGLE);
+						Object rect = c.newInstance();
+						System.out.println("[DBG] Created a Rectangle object.");
+
+						Class<?> rectClass = rect.getClass();
+						Method m = rectClass.getDeclaredMethod(mthdNames[0], new Class[] {});
+						System.out.println("[DBG] Called getDeclaredMethod.");
+						Object invoker = m.invoke(rect, new Object[] {});
+						System.out.println("[DBG] getVal result: " + invoker);
+						cc.writeFile(OUTPUT_DIR);
+//						}
+//						else{
+//							continue;
+//						}
 					}
+					
 					break;
 				default:
 					break;
 				}
-         }
-//         cp.insertClassPath(INPUT_DIR);
-//         System.out.println("[DBG] insert classpath: " + INPUT_DIR);
-//
-//         CtClass cc = cp.get(TARGET_RECTANGLE);
-//         cc.setSuperclass(cp.get(TARGET_POINT));
-         CtMethod m1 = cc.getDeclaredMethod("getVal");
-         m1.insertBefore("{ " //
-               + "move(10, 20);" //
-               + "System.out.println(\"[TR] getX result : \" + getX()); }");
+			}
 
-         Loader cl = new Loader(cp);
-         Class<?> c = cl.loadClass(TARGET_RECTANGLE);
-         Object rect = c.newInstance();
-         System.out.println("[DBG] Created a Rectangle object.");
-
-         Class<?> rectClass = rect.getClass();
-         Method m = rectClass.getDeclaredMethod("getVal", new Class[] {});
-         System.out.println("[DBG] Called getDeclaredMethod.");
-         Object invoker = m.invoke(rect, new Object[] {});
-         System.out.println("[DBG] getVal result: " + invoker);
-      } catch (Exception e) {
-         e.printStackTrace();
-      }
-   }
-
-   /*static void insertClassPath(ClassPool pool) throws NotFoundException {
-      String strClassPath = WORK_DIR + File.separator + "classfiles";
-      pool.insertClassPath(strClassPath);
-      System.out.println("[DBG] insert classpath: " + strClassPath);
-   }*/
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }
