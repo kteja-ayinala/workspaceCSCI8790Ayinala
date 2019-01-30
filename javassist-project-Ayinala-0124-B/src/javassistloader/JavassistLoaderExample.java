@@ -20,7 +20,7 @@ public class JavassistLoaderExample {
 	private static final String TARGET_RECTANGLE = "target.Rectangle";
 	static String _S = File.separator;
 	static String OUTPUT_DIR = WORK_DIR + _S + "output";
-	static String verifyMethod ;
+	static String verifyMethod;
 
 	public static void main(String[] args) {
 		try {
@@ -40,13 +40,12 @@ public class JavassistLoaderExample {
 						System.out.println("[DBG] class path: " + INPUT_DIR);
 
 						CtClass cc = pool.get(TARGET_RECTANGLE);
-						 cc.defrost();
+						cc.defrost();
 						cc.setSuperclass(pool.get(TARGET_POINT));
-						System.out.println(verifyMethod+" "+ mthdNames[0].toString());
-//						if(!verifyMethod.equals(mthdNames[0].toString())){
+						System.out.println(verifyMethod + " " + mthdNames[0].toString());
+						// if(!verifyMethod.equals(mthdNames[0].toString())){
 						CtMethod m1 = cc.getDeclaredMethod(mthdNames[0]);
-						
-						 
+						verifyMethod = mthdNames[0].toString();
 						m1.insertBefore("{ " //
 								+ mthdNames[1].toString() + "();" //
 								+ "System.out.println(\"[TR] getX result : \"+" + mthdNames[2] + "());}");
@@ -61,12 +60,12 @@ public class JavassistLoaderExample {
 						Object invoker = m.invoke(rect, new Object[] {});
 						System.out.println("[DBG] getVal result: " + invoker);
 						cc.writeFile(OUTPUT_DIR);
-//						}
-//						else{
-//							continue;
-//						}
+						// }
+						// else{
+						// continue;
+						// }
 					}
-					
+
 					break;
 				default:
 					break;
