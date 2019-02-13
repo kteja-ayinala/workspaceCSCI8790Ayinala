@@ -46,8 +46,7 @@ public class SubstituteMethodBody extends ClassLoader {
 						INDEX = Integer.parseInt(input[2]);
 						VALUE = input[3];
 						if (MODIFIED_METHODS != null && (MODIFIED_METHODS.contains(TARGET_METHOD))) {
-							System.out.println("[WRN]: This method" + TARGET_METHOD + "has been modified");
-							
+							System.out.println("[WRN]: This method" + TARGET_METHOD + "has been modified");							
 							continue;
 						} else {
 							SubstituteMethodBody s = new SubstituteMethodBody();
@@ -86,18 +85,19 @@ public class SubstituteMethodBody extends ClassLoader {
 					String className = m.getClassName();
 					String methodName = m.getMethodName();
 
-					if (className.equals(TARGET_MY_APP) && methodName.equals(DRAW_METHOD)) {
-						System.out.println(
-								"[Edited by ClassLoader] method name: " + methodName + ", line: " + m.getLineNumber());
-						String block1 = "{" + _L_ //
-								+ "System.out.println(\"Before a call to " + methodName + ".\"); " + _L_ //
-								+ "$proceed($$); " + _L_ //
-								+ "System.out.println(\"After a call to " + methodName + ".\"); " + _L_ //
-								+ "}";
-						System.out.println("[DBG] BLOCK1: " + block1);
-						System.out.println("------------------------");
-						m.replace(block1);
-					} else if (className.equals(TARGET_MY_APP) && methodName.equals(TARGET_METHOD)) {
+//					if (className.equals(TARGET_MY_APP) && methodName.equals(DRAW_METHOD)) {
+//						System.out.println(
+//								"[Edited by ClassLoader] method name: " + methodName + ", line: " + m.getLineNumber());
+//						String block1 = "{" + _L_ //
+//								+ "System.out.println(\"Before a call to " + methodName + ".\"); " + _L_ //
+//								+ "$proceed($$); " + _L_ //
+//								+ "System.out.println(\"After a call to " + methodName + ".\"); " + _L_ //
+//								+ "}";
+//						System.out.println("[DBG] BLOCK1: " + block1);
+//						System.out.println("------------------------");
+//						m.replace(block1);
+//					} else 
+						if (className.equals(TARGET_MY_APP) && methodName.equals(TARGET_METHOD)) {
 						MODIFIED_METHODS.add(TARGET_METHOD);
 						System.out.println(
 								"[Edited by ClassLoader] method name: " + methodName + ", line: " + m.getLineNumber());
