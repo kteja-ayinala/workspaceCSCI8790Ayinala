@@ -67,65 +67,73 @@ public class NewExprAccess extends ClassLoader {
 			cc = pool.get(name);
 			cc.instrument(new ExprEditor() {
 				public void edit(NewExpr newExpr) throws CannotCompileException {
-					String fieldName = null;
-					String fieldType = null;
-					String fieldName1 = null;
-					String fieldType1 = null;
 					try {
 						CtField fields[] = newExpr.getEnclosingClass().getDeclaredFields();
 						if (fields.length < PARAMETERS_COUNT) {
 							PARAMETERS_COUNT = fields.length;
 						}
-
 						String log = String.format(
 								"[Edited by ClassLoader] new expr: %s, " //
 										+ "line: %d, signature: %s",
 								newExpr.getEnclosingClass().getName(), //
 								newExpr.getLineNumber(), newExpr.getSignature());
 						System.out.println(log);
-						if (PARAMETERS_COUNT == 1) {
-							fieldName = fields[0].getName();
-							fieldType = fields[0].getType().getName();
+						String block1 = "{ " + _L_ //
+								+ "  $_ = $proceed($$);" + _L_;
 
-							String block1 = "{ " + _L_ //
-									+ "  $_ = $proceed($$);" + _L_ //
+						for (int i = 0; i < PARAMETERS_COUNT; i++) {
+							String fieldName = fields[i].getName();
+							String fieldType = fields[i].getType().getName();
+							block1 += ( //
+							"{ " + _L_ //
 									+ "  String cName = $_.getClass().getName();" + _L_ //
-									+ "  String fName = $_.getClass().getDeclaredFields()[0].getName();" + _L_ //
+									+ "  String fName = $_.getClass().getDeclaredFields()["+i+"].getName();" + _L_ //
 									+ "  String fieldFullName = cName + \".\" + fName;" + _L_ //
 									+ fieldType + " fieldValue = $_." + fieldName + ";" + _L_ //
 									+ "  System.out.println( \"[Instrument] \" +  fieldFullName + \" :\" + fieldValue);"
 									+ _L_ //
-									+ "}"; //
-
-							System.out.println(block1);
-							newExpr.replace(block1);
+									+ "}" + _L_ //
+							); //
 						}
-						if (PARAMETERS_COUNT == 2) {
-							for (int i = 0; i < PARAMETERS_COUNT; i++) {
-								if (i == 0) {
-									fieldName = fields[i].getName();
-									fieldType = fields[i].getType().getName();
-								} else {
-									fieldName1 = fields[i].getName();
-									fieldType1 = fields[i].getType().getName();
-								}
-							}
+						block1 += "}";
+						System.out.println(block1);
+						newExpr.replace(block1);
 
-							String block1 = "{ " + _L_ //
-									+ "  $_ = $proceed($$);" + _L_ //
-									+ "  String cName = $_.getClass().getName();" + _L_ //
-									+ "  String fName = $_.getClass().getDeclaredFields()[0].getName();" + _L_ //
-									+ "  String fieldFullName = cName + \".\" + fName;" + _L_ //
-									+ "  String fName1 = $_.getClass().getDeclaredFields()[1].getName();" + _L_ //
-									+ fieldType + " fieldValue = $_." + fieldName + ";" + _L_ //
-									+ fieldType1 + " fieldValue1 = $_." + fieldName1 + ";" + _L_ //
-									+ "  System.out.print( \"[Instrument] \" +  fieldFullName + \" :\" + fieldValue+ "
-									+ "\", \" );" + "  System.out.println(  fName1 + \" :\" + fieldValue1);" + _L_ //
-									+ "}"; //
-
-							System.out.println(block1);
-							newExpr.replace(block1);
-						}
+						// if (PARAMETERS_COUNT == 2) {
+						// for (int i = 0; i < PARAMETERS_COUNT; i++) {
+						// if (i == 0) {
+						// fieldName = fields[i].getName();
+						// fieldType = fields[i].getType().getName();
+						// } else {
+						// fieldName1 = fields[i].getName();
+						// fieldType1 = fields[i].getType().getName();
+						// }
+						// }
+						//
+						// String block1 = "{ " + _L_ //
+						// + " $_ = $proceed($$);" + _L_ //
+						// + " String cName = $_.getClass().getName();" + _L_ //
+						// + " String fName =
+						// $_.getClass().getDeclaredFields()[0].getName();" +
+						// _L_ //
+						// + " String fieldFullName = cName + \".\" + fName;" +
+						// _L_ //
+						// + " String fName1 =
+						// $_.getClass().getDeclaredFields()[1].getName();" +
+						// _L_ //
+						// + fieldType + " fieldValue = $_." + fieldName + ";" +
+						// _L_ //
+						// + fieldType1 + " fieldValue1 = $_." + fieldName1 +
+						// ";" + _L_ //
+						// + " System.out.print( \"[Instrument] \" +
+						// fieldFullName + \" :\" + fieldValue+ "
+						// + "\", \" );" + " System.out.println( fName1 + \" :\"
+						// + fieldValue1);" + _L_ //
+						// + "}"; //
+						//
+						// System.out.println(block1);
+						// newExpr.replace(block1);
+						// }
 
 					} catch (NotFoundException e) {
 						e.printStackTrace();
